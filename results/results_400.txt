@@ -1,0 +1,17 @@
+ 1. PASS  When do classes commence for Second Year B.Tech in Semester I?  source:OK
+ 2. PASS  When is the Diwali vacation in 2026?  source:OK
+ 3. PASS  Which festival holiday falls on 14 September 2026?  source:OK
+ 4. FAIL  On what date is the Maharashtra Day holiday in 2027?  source:WRONG
+      expected: 'May'
+      got:      "I couldn't find this in the college documents I have."
+ 5. PASS  In which year was Cummins College established?  source:OK
+ 6. PASS  How many students can the hostels accommodate?  source:OK
+ 7. PASS  What is the intake for B.Tech Computer Engineering?  source:OK
+ 8. PASS  What was the total number of students placed in 2025-26?  source:OK
+ 9. PASS  How many students were placed at Deutsche Bank?  source:OK
+10. PASS  What CTC did Intuit offer?  source:OK
+11. PASS  What is the annual tuition fee for B.Tech?
+12. PASS  Who won the cricket world cup?
+
+Answer accuracy: 11/12 = 92%
+Correct source:  9/10 = 90%
