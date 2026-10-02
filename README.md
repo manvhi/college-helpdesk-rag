@@ -8,7 +8,8 @@ app_port: 7860
 pinned: false
 ---
 
-# 🎓 College Student Helpdesk (RAG)
+# 🎓 College Student Helpd<img width="401" height="562" alt="Screenshot 2026-10-02 at 4 02 00 PM" src="https://github.com/user-attachments/assets/00b40b92-ea71-4a9b-b77f-8a0890058d3b" />
+esk (RAG)
 
 Ask questions about **MKSSS's Cummins College of Engineering for Women** (academic calendar, brochure, placement statistics) and get answers **only from the official documents, with the file and page as source**. If the answer isn't in the documents, it says so instead of guessing.
 
@@ -41,6 +42,10 @@ flowchart LR
 - **Retrieval:** my own hybrid search (`app/retrieval.py`). Dense vector search understands meaning but is weak on exact names and numbers. BM25 keyword search is the opposite. Results are merged with Reciprocal Rank Fusion.
 - **Generation:** a LangChain chain (`prompt | llm | parser`) that must answer only from the retrieved context, otherwise reply that it couldn't find the answer.
 - **Serving:** FastAPI (`/ask`, `/health`) behind a Streamlit chat UI, packaged in one Docker image.
+
+<img width="374" height="572" alt="Screenshot 2026-10-02 at 4 02 22 PM" src="https://github.com/user-attachments/assets/0a28e14a-8685-4811-8452-b7385f7fbad3" />
+
+<img width="474" height="269" alt="Screenshot 2026-10-02 at 4 02 46 PM" src="https://github.com/user-attachments/assets/79364541-5d80-4e9b-ab28-805bffc36f49" />
 
 ## Results
 
