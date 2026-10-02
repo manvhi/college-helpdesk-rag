@@ -1,10 +1,19 @@
 """FastAPI backend.  Run:  uvicorn app.api:app --reload   then open http://localhost:8000/docs"""
+from contextlib import asynccontextmanager
+
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel, Field
 
 from app import rag
 
-app = FastAPI(title="College Student Helpdesk (RAG)")
+
+@asynccontextmanager
+async def lifespan(app):
+    rag.get_vectorstore()          # load the embedding model + Chroma once at startup, not on the first question
+    yield
+
+
+app = FastAPI(title="College Student Helpdesk (RAG)", lifespan=lifespan)
 
 
 class Question(BaseModel):

@@ -1,16 +1,16 @@
 [
-  {"question": "When do classes commence for Second Year B.Tech in Semester I?", "expect": "July", "file": "Academic-Calendar"},
-  {"question": "When is the Diwali vacation in 2026?", "expect": "Nov", "file": "Academic-Calendar"},
-  {"question": "Which festival holiday falls on 14 September 2026?", "expect": "Ganesh", "file": "Academic-Calendar"},
-  {"question": "On what date is the Maharashtra Day holiday in 2027?", "expect": "May", "file": "Academic-Calendar"},
+  {"question": "When do classes commence for Second Year B.Tech in Semester I?", "expect": "July", "evidence": "06 July 2026", "file": "Academic-Calendar"},
+  {"question": "When is the Diwali vacation in 2026?", "expect": "Nov", "evidence": "07 Nov 2026 to 15 Nov 2026", "file": "Academic-Calendar"},
+  {"question": "Which festival holiday falls on 14 September 2026?", "expect": "Ganesh", "evidence": "Ganesh Chaturthi 14 September 2026", "file": "Academic-Calendar"},
+  {"question": "On what date is the Maharashtra Day holiday in 2027?", "expect": "May", "evidence": "Maharashtra Day 01 May 2027", "file": "Academic-Calendar"},
 
-  {"question": "In which year was Cummins College established?", "expect": "1991", "file": "College-Brochure"},
-  {"question": "How many students can the hostels accommodate?", "expect": "950", "file": "College-Brochure"},
-  {"question": "What is the intake for B.Tech Computer Engineering?", "expect": "180", "file": "College-Brochure"},
+  {"question": "In which year was Cummins College established?", "expect": "1991", "evidence": "established in the year 1991", "file": "College-Brochure"},
+  {"question": "How many students can the hostels accommodate?", "expect": "950", "evidence": "accommodate 950", "file": "College-Brochure"},
+  {"question": "What is the intake for B.Tech Computer Engineering?", "expect": "180", "evidence": "Computer Engineering 180", "file": "College-Brochure"},
 
-  {"question": "What was the total number of students placed in 2025-26?", "expect": "520", "file": "Placement-data"},
-  {"question": "How many students were placed at Deutsche Bank?", "expect": "30", "file": "Placement-data"},
-  {"question": "What CTC did Intuit offer?", "expect": "45.68", "file": "Placement-data"},
+  {"question": "What was the total number of students placed in 2025-26?", "expect": "520", "evidence": "Total No of students Placed =520", "file": "Placement-data"},
+  {"question": "How many students were placed at Deutsche Bank?", "expect": "30", "evidence": "Deutsche Bank 30 22", "file": "Placement-data"},
+  {"question": "What CTC did Intuit offer?", "expect": "45.68", "evidence": "Intuit 3 45.68", "file": "Placement-data"},
 
   {"question": "What is the annual tuition fee for B.Tech?", "expect": "NOT_FOUND"},
   {"question": "Who won the cricket world cup?", "expect": "NOT_FOUND"}

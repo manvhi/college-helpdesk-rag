@@ -6,6 +6,7 @@ from langchain_core.output_parsers import StrOutputParser
 from langchain_core.prompts import ChatPromptTemplate
 
 from app import config
+from app.retrieval import search
 
 NOT_FOUND = "I couldn't find this in the college documents I have."
 
@@ -40,11 +41,11 @@ def format_context(docs):
                        for d in docs)
 
 
-def answer(question, vectorstore=None, llm=None, k=config.TOP_K):
+def answer(question, vectorstore=None, llm=None, k=config.TOP_K, mode=None):
     """Returns {"answer": str, "sources": [{"file":..., "page":...}, ...]}"""
     vs = vectorstore or get_vectorstore()
-    docs = vs.similarity_search(question, k=k)               # <- the "retrieval" step
-    chain = PROMPT | (llm or get_llm()) | StrOutputParser()  # <- the "generation" step
+    docs = search(vs, question, k, mode or config.RETRIEVAL_MODE)   # <- the "retrieval" step
+    chain = PROMPT | (llm or get_llm()) | StrOutputParser()          # <- the "generation" step
     text = chain.invoke({"context": format_context(docs), "question": question})
 
     sources, seen = [], set()

@@ -13,9 +13,12 @@ CHROMA_DIR = BASE_DIR / "chroma_db"   # vector database is stored here
 EMBED_MODEL = os.getenv("EMBED_MODEL", "sentence-transformers/all-MiniLM-L6-v2")
 
 # LLM used to write the final answer. Check Google AI Studio for currently available model names.
-LLM_MODEL = os.getenv("LLM_MODEL", "gemini-2.5-flash")
+LLM_MODEL = os.getenv("LLM_MODEL", "gemini-3.5-flash-lite")
 
 # RAG knobs -- these are the things you should experiment with and note the results
 CHUNK_SIZE = int(os.getenv("CHUNK_SIZE", "800"))
 CHUNK_OVERLAP = int(os.getenv("CHUNK_OVERLAP", "150"))
 TOP_K = int(os.getenv("TOP_K", "4"))
+
+# "dense" (vectors only), "bm25" (keywords only) or "hybrid" (both, merged). Measure before changing!
+RETRIEVAL_MODE = os.getenv("RETRIEVAL_MODE", "hybrid")
