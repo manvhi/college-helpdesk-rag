@@ -8,8 +8,7 @@ app_port: 7860
 pinned: false
 ---
 
-# 🎓 College Student Helpd<img width="401" height="562" alt="Screenshot 2026-10-02 at 4 02 00 PM" src="https://github.com/user-attachments/assets/00b40b92-ea71-4a9b-b77f-8a0890058d3b" />
-esk (RAG)
+# 🎓 College Student Helpdesk (RAG)
 
 Ask questions about **MKSSS's Cummins College of Engineering for Women** (academic calendar, brochure, placement statistics) and get answers **only from the official documents, with the file and page as source**. If the answer isn't in the documents, it says so instead of guessing.
 
@@ -19,6 +18,8 @@ Ask questions about **MKSSS's Cummins College of Engineering for Women** (academ
 
 ## Why this exists
 Syllabus, calendar and placement information live in separate PDFs, and the same questions keep getting asked in group chats. This project turns those PDFs into a searchable assistant that always shows where an answer came from.
+
+<img width="1141" height="656" alt="Screenshot 2026-10-02 at 4 04 33 PM" src="https://github.com/user-attachments/assets/8ab4d850-a196-4283-9f28-039bb35f2096" />
 
 ## How it works
 
