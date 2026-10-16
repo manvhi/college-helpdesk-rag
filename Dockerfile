@@ -1,23 +1,24 @@
-FROM python:3.11-slim
+FROM python:3.12-slim
 
-# Hugging Face Spaces runs containers as user id 1000
-RUN useradd -m -u 1000 user
-USER user
-ENV HOME=/home/user \
-    PATH=/home/user/.local/bin:$PATH \
-    PORT=7860
-WORKDIR /home/user/app
+# Run the application as a non-root user.
+RUN useradd --create-home --uid 1000 appuser
+USER appuser
+WORKDIR /home/appuser/app
 
-# CPU-only torch keeps the image much smaller
-RUN pip install --no-cache-dir torch --index-url https://download.pytorch.org/whl/cpu
-COPY --chown=user requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+ENV HOME=/home/appuser \
+    PATH=/home/appuser/.local/bin:$PATH \
+    HF_HOME=/home/appuser/.cache/huggingface \
+    PORT=8501
 
-COPY --chown=user . .
+# Copy dependencies first so source-code changes can reuse this Docker layer.
+COPY --chown=appuser requirements.txt .
+RUN pip install --user --no-cache-dir -r requirements.txt
 
-# Build the vector index at image build time (also downloads the embedding model once)
+COPY --chown=appuser . .
+
+# Build the index and download both Hugging Face models during image creation.
 RUN python -m app.ingest
+RUN python -c "from app.retrieval import _get_reranker; _get_reranker()"
 
-EXPOSE 7860
-# GOOGLE_API_KEY is provided at runtime as a Space secret
-CMD ["sh", "start.sh"]
+EXPOSE 8501
+ENTRYPOINT ["./entrypoint.sh"]

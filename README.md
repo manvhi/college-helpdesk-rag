@@ -1,102 +1,167 @@
----
-title: College Student Helpdesk
-emoji: 🎓
-colorFrom: indigo
-colorTo: blue
-sdk: docker
-app_port: 7860
-pinned: false
----
-
 # 🎓 College Student Helpdesk (RAG)
 
-Ask questions about **MKSSS's Cummins College of Engineering for Women** (academic calendar, brochure, placement statistics) and get answers **only from the official documents, with the file and page as source**. If the answer isn't in the documents, it says so instead of guessing.
+Ask questions about **MKSSS's Cummins College of Engineering for Women** using three public PDFs: the academic calendar, college brochure, and placement statistics. Answers are generated only from those documents and include the PDF file and page. If the documents do not contain the answer, the app says:
 
-**Live demo:** _add your Hugging Face Space link here_ &nbsp;|&nbsp; **Stack:** LangChain · ChromaDB · FastAPI · Streamlit · Gemini · Docker
+> I couldn't find this in the college documents I have.
 
-> Unofficial student project, not affiliated with the college. It only uses public documents. Answers may be wrong, so check the official source for anything important.
+**Stack:** Python 3.12 · LangChain · ChromaDB · MiniLM embeddings · BM25 · cross-encoder reranking · Gemini · FastAPI · Streamlit · Docker
 
-## Why this exists
-Syllabus, calendar and placement information live in separate PDFs, and the same questions keep getting asked in group chats. This project turns those PDFs into a searchable assistant that always shows where an answer came from.
+> Unofficial student project, not affiliated with the college. It only uses public documents. Check the official source before relying on any important information.
 
 <img width="1141" height="656" alt="Screenshot 2026-10-02 at 4 04 33 PM" src="https://github.com/user-attachments/assets/8ab4d850-a196-4283-9f28-039bb35f2096" />
 
-## How it works
+## Architecture
 
 ```mermaid
 flowchart LR
     subgraph Once["Once: python -m app.ingest"]
-        A[PDFs in data/] --> B[Split into chunks<br/>800 chars, 150 overlap]
-        B --> C[Embed locally<br/>MiniLM]
-        C --> D[(Chroma)]
+        A[PDFs in data/pdfs/] --> B[Parent chunks 2000 chars]
+        B --> C[Child chunks 400 chars]
+        C --> D[MiniLM embeddings]
+        D --> E[(Chroma)]
+        B --> F[(parents.json)]
     end
     subgraph Each["Every question"]
-        Q[Question] --> H[Hybrid retrieval<br/>vectors + BM25, merged with RRF]
-        D --> H
-        H --> P[Prompt: answer only from<br/>these chunks]
-        P --> G[Gemini]
-        G --> R[Answer + sources]
+        Q[Question + last 6 turns] --> W[Follow-up rewrite]
+        W --> H[Hybrid: vectors + BM25]
+        H --> X[Cross-encoder rerank top 10]
+        X --> P[Expand child hits to parent chunks]
+        P --> G[Gemini: answer only from context]
+        G --> R[Answer + file/page citations]
+        E --> H
+        F --> P
     end
 ```
 
-- **Ingestion:** LangChain loaders and a recursive splitter; chunks keep file name and page for citations.
-- **Retrieval:** my own hybrid search (`app/retrieval.py`). Dense vector search understands meaning but is weak on exact names and numbers. BM25 keyword search is the opposite. Results are merged with Reciprocal Rank Fusion.
-- **Generation:** a LangChain chain (`prompt | llm | parser`) that must answer only from the retrieved context, otherwise reply that it couldn't find the answer.
-- **Serving:** FastAPI (`/ask`, `/health`) behind a Streamlit chat UI, packaged in one Docker image.
+- **Ingestion:** `app/ingest.py` loads every PDF recursively, keeps page metadata, stores searchable 400-character child chunks in Chroma, and saves 2000-character parents in `chroma_db/parents.json`.
+- **Retrieval:** `app/retrieval.py` supports `dense`, `bm25`, `hybrid`, and `rerank`. The default is hybrid retrieval followed by a cross-encoder (`cross-encoder/ms-marco-MiniLM-L-6-v2`) and parent expansion.
+- **Generation:** `app/rag.py` rewrites follow-up questions, formats the retrieved parents with citations, and uses a strict context-only Gemini prompt.
+- **Serving:** FastAPI provides `/ask`, `/ask/stream`, and `/health`. Streamlit calls the API when `API_URL` is set; otherwise it runs `rag.answer()` in-process, which is the Community Cloud deployment path.
 
 <img width="374" height="572" alt="Screenshot 2026-10-02 at 4 02 22 PM" src="https://github.com/user-attachments/assets/0a28e14a-8685-4811-8452-b7385f7fbad3" />
 
 <img width="474" height="269" alt="Screenshot 2026-10-02 at 4 02 46 PM" src="https://github.com/user-attachments/assets/79364541-5d80-4e9b-ab28-805bffc36f49" />
 
-## Results
+## Measured results
 
-I tested retrieval and answers separately on 12 hand-written questions (10 answerable, 2 that the documents can't answer). Retrieval is measured without the LLM, so a wrong answer can be traced to search or to generation.
+The original 12-question experiment is kept for comparison:
 
-Retrieval mode (800-character chunks), % of questions where the right passage is in the top k, and MRR:
+| Experiment | Result |
+|---|---|
+| Rerank, parent-child, k=3 | Hit@k 100%, MRR 1.00, 12/12 answers |
+| Hybrid, parent-child, k=4 | MRR 0.95, 12/12 answers |
+| Hybrid, flat 800-character chunks, k=4 | MRR 0.93, 12/12 answers |
+| Flat 400-character chunks | 11/12 answers |
 
-| Mode | hit@1 | hit@2 | hit@4 | MRR (k=4) |
-|---|---|---|---|---|
-| Dense (vectors only) | 50% | 80% | 100% | 0.72 |
-| BM25 (keywords only) | 80% | 90% | 100% | 0.88 |
-| **Hybrid (default)** | **90%** | **90%** | **100%** | **0.93** |
+The expanded hand-written set has 25 questions: 20 answerable and 5 expected refusals. Retrieval-only checks at k=3 were:
 
-Chunk size (dense retrieval, hit@4): 400 chars → 90%, 800 → 100%, 1200 → 100%. Small chunks split answers across pieces.
+| Mode | Answerable hits | Hit@3 | MRR |
+|---|---:|---:|---:|
+| Dense | 18/20 | 90% | 0.84 |
+| BM25 | 20/20 | 100% | 0.95 |
+| Hybrid | 19/20 | 95% | 0.93 |
+| **Rerank (default)** | **20/20** | **100%** | **1.00** |
 
-End to end with hybrid retrieval: **12/12 answers correct**, including both out-of-scope questions being refused.
+The final full rerank generation run attempted all 25 questions and produced **25/25 correct answers**, including the five expected refusals and three follow-up questions. An earlier run had 8 transient Gemini provider errors/timeouts; the final run completed without them, so this remains a small-set result rather than a reliability guarantee.
 
-### Limitations (read before trusting these numbers)
-- The test set is small and was written by me, so 100% shows the system works on these questions, not that it is flawless. The reliable result is the retrieval gain (50% → 90% hit@1).
-- My questions reuse words from the documents, which favours keyword search. Paraphrased questions would be a harder, fairer test.
-- Tables are flattened to text, so questions about table rows are the weakest area.
-- Only three public documents; no chat memory; the free Gemini tier sometimes returns temporary 503 errors.
+Ragas was run on 10 answerable questions with references, Gemini as the evaluator LLM, and local MiniLM embeddings. The per-question output is in `eval_results.json`.
 
-## Run it locally
+| Mode | k | Hit@k | MRR | Faithfulness | Answer relevancy | Context recall |
+|---|---:|---:|---:|---:|---:|---:|
+| Rerank | 3 | 100% | 1.00 | 1.000 | 0.649 | 1.000 |
+
+Ragas is a small LLM-judge sample: several answer-relevancy rows were unavailable because of provider errors, so the average is based on the available scores.
+
+### Latency and memory
+
+Measured in one warm local process for the same Deutsche Bank question:
+
+| Retrieval path | Median retrieval time |
+|---|---:|
+| Hybrid | 16.9 ms |
+| Rerank | 164.7 ms |
+| Rerank overhead | about 148 ms |
+
+The first rerank call also loads the cross-encoder and took about 8 seconds in that process. A cold rerank retrieval process reached **535,314,432 bytes (about 510 MiB) peak resident memory**. This is close to a 512 MiB limit; an ONNX/fastembed embedding fallback is a future deployment option if the Community Cloud instance cannot keep the current MiniLM + PyTorch stack alive.
+
+## Limitations and decisions
+
+- The evaluation set is small and hand-written. Its scores do not prove general accuracy.
+- Some wording still overlaps the documents, which favours keyword search.
+- Tables are flattened to text, so aggregation questions such as totals, averages, or comparisons are weaker than direct lookups.
+- Hit@k is now measured against larger parent chunks, not the old flat chunks.
+- Ragas uses a small sample and an LLM judge, so its scores have sampling and provider noise.
+- Gemini's free tier can return temporary 503/high-demand errors or timeouts.
+- A scraper was tried and dropped because the college website blocked automated requests.
+- A SQL engine and intent router were intentionally skipped as overkill for this learning project.
+
+## Run locally
 
 ```bash
-git clone <this repo> && cd <this repo>
-python3.12 -m venv venv && source venv/bin/activate
+git clone <this-repo> && cd <this-repo>
+python3.12 -m venv venv
+source venv/bin/activate
 pip install -r requirements.txt
-echo "GOOGLE_API_KEY=your_key" > .env        # free key from Google AI Studio
-python -m app.ingest                          # builds the vector database from data/
-uvicorn app.api:app --reload                  # API at http://localhost:8000/docs
-streamlit run ui.py                           # chat UI at http://localhost:8501
+printf 'GOOGLE_API_KEY=your_key\n' > .env
+python -m app.ingest
 ```
 
-Evaluate: `python eval.py --no-llm --mode hybrid --k 4` (retrieval only, free) or `python eval.py` (with Gemini).
-Docker: `docker build -t helpdesk . && docker run -p 7860:7860 -e GOOGLE_API_KEY=... helpdesk`
+API mode:
+
+```bash
+uvicorn app.api:app --reload       # http://localhost:8000/docs
+API_URL=http://localhost:8000 streamlit run ui.py
+```
+
+In-process mode (the Streamlit Community Cloud path):
+
+```bash
+streamlit run ui.py
+```
+
+If `chroma_db/` is missing, `ui.py` builds it once using `st.cache_resource`. Do not commit `.env` or `chroma_db/`.
+
+Evaluation:
+
+```bash
+python eval.py --no-llm --mode dense --k 3
+python eval.py --no-llm --mode bm25 --k 3
+python eval.py --no-llm --mode hybrid --k 3
+python eval.py --no-llm --mode rerank --k 3
+python eval.py --mode rerank --k 3
+python eval.py --ragas --mode rerank --k 3
+```
+
+`eval.py` prints a Markdown comparison row. The Ragas command writes `eval_results.json`.
+
+Docker:
+
+```bash
+docker build -t college-helpdesk .
+docker run --rm -p 8501:8501 -e GOOGLE_API_KEY=your_key college-helpdesk
+```
+
+The Docker image uses Python 3.12, CPU-only PyTorch, a non-root user, and downloads the embedding and reranker models while building the image.
 
 ## Project structure
-```
-app/ingest.py      load PDFs → chunks → embeddings → Chroma
-app/retrieval.py   dense, BM25 and hybrid (RRF) search
-app/rag.py         prompt + Gemini chain, returns answer and sources
-app/api.py         FastAPI endpoints
-ui.py              Streamlit chat UI
-eval.py            retrieval vs generation evaluation (hit@k, MRR, diagnosis labels)
-questions.json     test questions with expected answers and evidence
+
+```text
+app/config.py       settings and environment overrides
+app/ingest.py       PDFs -> parent/child chunks -> Chroma
+app/retrieval.py    dense, BM25, hybrid RRF, reranking, parent expansion
+app/rag.py          follow-up rewrite, prompt, Gemini, timings, streaming
+app/api.py          FastAPI endpoints and validation/error handling
+ui.py               Streamlit UI with API or in-process mode
+data/pdfs/          the three public source PDFs
+eval.py             retrieval/generation/Ragas evaluation
+eval_results.json   latest Ragas per-question scores
+questions.json      hand-written questions, evidence, references, history
+Dockerfile          reproducible CPU image
+entrypoint.sh       API background process + Streamlit foreground process
 ```
 
-## Roadmap
-- LangGraph router: documents vs. data questions, with chat memory and query rewriting
-- Text-to-SQL on the placement table (counts, averages) with read-only guardrails
-- Streaming answers and a feedback log
+## Future work
+
+- Add read-only text-to-SQL with row limits for reliable aggregation questions.
+- Scrape additional college information only with the college's permission.
+- Consider an ONNX/fastembed fallback if the current memory footprint is too high.
