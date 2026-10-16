@@ -1,5 +1,7 @@
 # 🎓 College Student Helpdesk (RAG)
 
+Link - https://college-appdesk-rag-puwghqb8yuykfouu8xiw73.streamlit.app/
+
 Ask questions about **MKSSS's Cummins College of Engineering for Women** using three public PDFs: the academic calendar, college brochure, and placement statistics. Answers are generated only from those documents and include the PDF file and page. If the documents do not contain the answer, the app says:
 
 > I couldn't find this in the college documents I have.
