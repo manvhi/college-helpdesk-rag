@@ -1,17 +1,32 @@
 [
-  {"question": "When do classes commence for Second Year B.Tech in Semester I?", "expect": "July", "evidence": "06 July 2026", "file": "Academic-Calendar"},
-  {"question": "When is the Diwali vacation in 2026?", "expect": "Nov", "evidence": "07 Nov 2026 to 15 Nov 2026", "file": "Academic-Calendar"},
-  {"question": "Which festival holiday falls on 14 September 2026?", "expect": "Ganesh", "evidence": "Ganesh Chaturthi 14 September 2026", "file": "Academic-Calendar"},
-  {"question": "On what date is the Maharashtra Day holiday in 2027?", "expect": "May", "evidence": "Maharashtra Day 01 May 2027", "file": "Academic-Calendar"},
+  {"question": "When do classes commence for Second Year B.Tech in Semester I?", "expect": "July", "evidence": "06 July 2026", "file": "Academic-Calendar", "reference": "Second Year B.Tech Semester I classes begin on 06 July 2026."},
+  {"question": "When is the Diwali vacation in 2026?", "expect": "Nov", "evidence": "07 Nov 2026 to 15 Nov 2026", "file": "Academic-Calendar", "reference": "The Diwali vacation runs from 07 November 2026 to 15 November 2026."},
+  {"question": "Which festival holiday falls on 14 September 2026?", "expect": "Ganesh", "evidence": "Ganesh Chaturthi 14 September 2026", "file": "Academic-Calendar", "reference": "The holiday is Ganesh Chaturthi on 14 September 2026."},
+  {"question": "On what date is the Maharashtra Day holiday in 2027?", "expect": "May", "evidence": "Maharashtra Day 01 May 2027", "file": "Academic-Calendar", "reference": "Maharashtra Day is on 01 May 2027."},
 
-  {"question": "In which year was Cummins College established?", "expect": "1991", "evidence": "established in the year 1991", "file": "College-Brochure"},
-  {"question": "How many students can the hostels accommodate?", "expect": "950", "evidence": "accommodate 950", "file": "College-Brochure"},
-  {"question": "What is the intake for B.Tech Computer Engineering?", "expect": "180", "evidence": "Computer Engineering 180", "file": "College-Brochure"},
+  {"question": "In which year was Cummins College established?", "expect": "1991", "evidence": "established in the year 1991", "file": "College-Brochure", "reference": "Cummins College was established in 1991."},
+  {"question": "How many students can the hostels accommodate?", "expect": "950", "evidence": "accommodate 950", "file": "College-Brochure", "reference": "The hostels can accommodate 950 students."},
+  {"question": "What is the intake for B.Tech Computer Engineering?", "expect": "180", "evidence": "Computer Engineering 180", "file": "College-Brochure", "reference": "B.Tech Computer Engineering has an intake of 180."},
 
-  {"question": "What was the total number of students placed in 2025-26?", "expect": "520", "evidence": "Total No of students Placed =520", "file": "Placement-data"},
-  {"question": "How many students were placed at Deutsche Bank?", "expect": "30", "evidence": "Deutsche Bank 30 22", "file": "Placement-data"},
-  {"question": "What CTC did Intuit offer?", "expect": "45.68", "evidence": "Intuit 3 45.68", "file": "Placement-data"},
+  {"question": "What was the total number of students placed in 2025-26?", "expect": "520", "evidence": "Total No of students Placed =520", "file": "Placement-data", "reference": "The placement statistics report 520 students placed in 2025-26."},
+  {"question": "How many students were placed at Deutsche Bank?", "expect": "30", "evidence": "Deutsche Bank 30 22", "file": "Placement-data", "reference": "Deutsche Bank hired 30 students."},
+  {"question": "What CTC did Intuit offer?", "expect": "45.68", "evidence": "Intuit 3 45.68", "file": "Placement-data", "reference": "Intuit offered a CTC of 45.68 lakhs."},
 
   {"question": "What is the annual tuition fee for B.Tech?", "expect": "NOT_FOUND"},
-  {"question": "Who won the cricket world cup?", "expect": "NOT_FOUND"}
+  {"question": "Who won the cricket world cup?", "expect": "NOT_FOUND"},
+
+  {"question": "For second-year students, what date marks the start of first-semester teaching?", "retrieval_question": "When do classes commence for Second Year B.Tech in Semester I?", "expect": "July", "evidence": "06 July 2026", "file": "Academic-Calendar", "reference": "Second Year B.Tech Semester I classes begin on 06 July 2026."},
+  {"question": "How many days does the 2026 Diwali break cover?", "retrieval_question": "When is the Diwali vacation in 2026?", "expect": "15 Nov", "evidence": "07 Nov 2026 to 15 Nov 2026", "file": "Academic-Calendar", "reference": "The listed Diwali vacation ends on 15 November 2026."},
+  {"question": "What is the sanctioned seat count for the computer B.Tech programme?", "retrieval_question": "What is the intake for B.Tech Computer Engineering?", "expect": "180", "evidence": "Computer Engineering 180", "file": "College-Brochure", "reference": "B.Tech Computer Engineering has an intake of 180."},
+  {"question": "Which ranking did The Week give the college in 2026?", "expect": "25", "evidence": "2026 29 29 25", "file": "College-Brochure", "reference": "The Week ranked the college 25 in 2026."},
+  {"question": "What average package is stated for academic year 2025-26?", "expect": "12.5", "evidence": "Average Package of Rs. 12.5 Lakhs", "file": "College-Brochure", "reference": "The brochure states an average package of Rs. 12.5 Lakhs for 2025-26."},
+  {"question": "How many people got offers from Wells Fargo?", "expect": "28", "evidence": "Wells Fargo 28 24", "file": "Placement-data", "reference": "Wells Fargo placed 28 students."},
+  {"question": "What CTC is listed for the lower-paying TCS Ninja offer?", "expect": "3.36", "evidence": "TCS (Ninja) 3 3.36", "file": "Placement-data", "reference": "The TCS (Ninja) offer has a CTC of 3.36 lakhs."},
+  {"question": "What is the hostel rent per semester?", "expect": "NOT_FOUND"},
+  {"question": "What is the weather in Pune today?", "expect": "NOT_FOUND"},
+  {"question": "What is the college's acceptance rate?", "expect": "NOT_FOUND"},
+
+  {"question": "And what about Intuit?", "retrieval_question": "What CTC did Intuit offer?", "expect": "3", "evidence": "Intuit 3 45.68", "file": "Placement-data", "history": [{"role": "user", "text": "How many students were placed at Deutsche Bank?"}, {"role": "assistant", "text": "30 students were placed at Deutsche Bank."}], "reference": "Intuit placed 3 students."},
+  {"question": "What was its CTC?", "retrieval_question": "What CTC did Deutsche Bank offer?", "expect": "22", "evidence": "Deutsche Bank 30 22", "file": "Placement-data", "history": [{"role": "user", "text": "How many students were placed at Deutsche Bank?"}, {"role": "assistant", "text": "30 students were placed at Deutsche Bank."}], "reference": "Deutsche Bank offered a CTC of 22 lakhs."},
+  {"question": "How many can they house?", "retrieval_question": "How many students can the hostels accommodate?", "expect": "950", "evidence": "accommodate 950", "file": "College-Brochure", "history": [{"role": "user", "text": "Tell me about the hostel facilities."}, {"role": "assistant", "text": "The college documents mention hostels."}], "reference": "The hostels can accommodate 950 students."}
 ]

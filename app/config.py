@@ -15,10 +15,16 @@ EMBED_MODEL = os.getenv("EMBED_MODEL", "sentence-transformers/all-MiniLM-L6-v2")
 # LLM used to write the final answer. Check Google AI Studio for currently available model names.
 LLM_MODEL = os.getenv("LLM_MODEL", "gemini-3.5-flash-lite")
 
-# RAG knobs -- these are the things you should experiment with and note the results
-CHUNK_SIZE = int(os.getenv("CHUNK_SIZE", "800"))
-CHUNK_OVERLAP = int(os.getenv("CHUNK_OVERLAP", "150"))
-TOP_K = int(os.getenv("TOP_K", "4"))
+# Parent-document chunking: small CHILD chunks are searched, big PARENT chunks go to the LLM
+CHILD_CHUNK_SIZE = int(os.getenv("CHILD_CHUNK_SIZE", "400"))
+CHILD_CHUNK_OVERLAP = int(os.getenv("CHILD_CHUNK_OVERLAP", "60"))
+PARENT_CHUNK_SIZE = int(os.getenv("PARENT_CHUNK_SIZE", "2000"))
+PARENT_CHUNK_OVERLAP = int(os.getenv("PARENT_CHUNK_OVERLAP", "200"))
+PARENTS_FILE = CHROMA_DIR / "parents.json"            # parent text, saved by ingest
 
-# "dense" (vectors only), "bm25" (keywords only) or "hybrid" (both, merged). Measure before changing!
-RETRIEVAL_MODE = os.getenv("RETRIEVAL_MODE", "hybrid")
+# Retrieval knobs
+TOP_K = int(os.getenv("TOP_K", "3"))
+RETRIEVAL_MODE = os.getenv("RETRIEVAL_MODE", "rerank")
+# Reranking: hybrid search fetches this many candidates, the cross-encoder keeps the best k
+RERANK_MODEL = os.getenv("RERANK_MODEL", "cross-encoder/ms-marco-MiniLM-L-6-v2")
+RERANK_CANDIDATES = int(os.getenv("RERANK_CANDIDATES", "10"))
